@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worm GPT</title>
+  <style>
+    body {
+      font-family: "Courier New", Courier, monospace;
+      background-color: black; /* Terminal-like background */
+      color: white; /* Text color for readability */
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header styles */
+    #header {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    /* Navigation Bar styles */
+    #navbar {
+      background-color: #444;
+      overflow: none;
+    }
+
+    #navbar a {
+      display: inline-block;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    #navbar a:hover {
+      background-color: #ddd;
+      color: black;
+      text-decoration: underline;
+    }
+
+    /* Chat box container */
+    #chat-box-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    /* Messages container */
+    #messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      display: flex;
+      flex-direction: column; /* Stack messages vertically */
+      gap: 10px; /* Space between user and bot messages */
+    }
+
+    /* Input field styled as a textarea with green color */
+    #user-input {
+      width: 95%;
+      background: transparent;
+      border: none;
+      color: green; /* Set text color to green */
+      font-size: 18px;
+      padding: 5px;
+      margin-top: 10px; /* Add a margin to push the input field below the messages */
+      outline: none;
+      min-height: 40px;
+      resize: none; /* Prevent resizing */
+    }
+
+    /* Footer styles */
+    #footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+    #disclaimer{
+    background-color: #333; 
+    color: white; 
+    padding: 10px;
+    text-align: center;
+    font-size: 14px; 
+    margin-top: 20px;
+    }
+
+    /* Message styles */
+    .message-container {
+      display: flex;
+      flex-wrap: wrap; /* Allow content to wrap when it's too long */
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .user-msg, .bot-msg {
+      font-size: 18px;
+      margin: 0; /* No margin between words */
+      padding: 5px;
+      display: inline-block; /* Ensure the message appears inline */
+    }
+
+    .user-msg {
+      color: limegreen;
+    }
+
+    .bot-msg {
+      color: lightblue;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div id="header">
+    Worm GPT
+  </div>
+
+  <!-- Navigation Bar -->
+  <div id="navbar">
+    <a href="https://t.me/Neonhacking">Channel</a>
+    <a href="https://neon-techinfo.github.io/About/">About</a>
+    <a href="https://neon-techinfo.github.io/Contact/">Contact</a>
+    <a href="https://neon-techinfo.github.io/Support">Support</a>
+    <a href="https://wa.me/09159626482?text=Sir+I+have+spotted+a+bug+in+your+worm+gpt+app">Report Bug</a>
+    <a href="#">More Apps</a>
+  </div>
+
+  <!-- Chat Box Section -->
+  <div id="chat-box-container">
+    <!-- Chat messages area -->
+    <div id="messages"></div>
+
+    <!-- Input field positioned below the current messages -->
+    <textarea id="user-input" placeholder="Type your message..."></textarea>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer">
+    &copy; 2025 Worm GPT. All rights reserved.
+  </div>
+    <!-- Disclaimer Section -->
+<div id="disclaimer" >
+  <p><strong>Disclaimer:</strong> This bot is provided for educational purposes only. The creator is not responsible for any misuse or unintended consequences resulting from the use of this bot. Users are encouraged to follow all applicable laws and guidelines when using this technology.</p>
+</div>
+
+  <script>
+    const API_URL = 'https://sweet.ai/prompt=';
+
+    const sendMessageToAPI = async (message) => {
+      const response = await fetch(`${API_URL}${encodeURIComponent(message)}`, {
+        method: 'GET',  // Assuming it's a GET request
+      });
+
+      const data = await response.json();  // Assuming the API responds with JSON
+      return data.response || "Sorry, I couldn't understand that."; // Adjust according to API response
+    };
+
+    // Displaying message in a container
+    const displayMessage = (message, isUser) => {
+      const messageContainer = document.createElement('div');
+      messageContainer.classList.add('message-container');
+
+      // Create individual message spans for user and bot
+      const msgElement = document.createElement('span');
+      msgElement.classList.add(isUser ? 'user-msg' : 'bot-msg');
+      messageContainer.appendChild(msgElement);
+      
+      document.getElementById('messages').appendChild(messageContainer);
+      document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+
+      // Now we append each letter to the message element one by one
+      sendLetterByLetter(msgElement, message);
+    };
+
+    // Function to send message letter by letter with random timing
+    const sendLetterByLetter = async (msgElement, message) => {
+      const letters = message.split(''); // Split the message into individual letters
+      let index = 0;
+      
+      const randomizeInterval = () => Math.floor(Math.random() * (500 - 1 + 1)) + 50; // Random interval between 50ms and 150ms
+
+      const interval = setInterval(() => {
+        if (index < letters.length) {
+          msgElement.textContent += letters[index]; // Add the next letter
+          index++;
+        } else {
+          clearInterval(interval); // Stop the interval when all letters are displayed
+        }
+      }, randomizeInterval()); // Set a random interval for each letter
+    };
+
+    // Listen for the Enter key to send the message and Shift + Enter for a line break
+    document.getElementById('user-input').addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { // When Enter is pressed without Shift
+        e.preventDefault(); // Prevent the default Enter behavior (line break)
+        const userInput = document.getElementById('user-input').value.trim();
+        
+        if (userInput) {
+          // Display user's message letter by letter
+          await displayMessage(userInput, true);
+          document.getElementById('user-input').value = '';  // Clear input field
+
+          // Get API's response
+          const apiResponse = await sendMessageToAPI(userInput);
+
+          // Display API's response letter by letter
+          await displayMessage(apiResponse, false);
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
